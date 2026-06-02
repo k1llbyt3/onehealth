@@ -40,13 +40,12 @@ def seed_data():
         "name": "Demo Patient",
         "email": "patient@onehealth.com",
         "role": "patient",
+        "passport_id": "HP-DEMO1",
         "profile": {
             "passport_id": "HP-DEMO1",
-            "health_score": 85,
             "blood_group": "O+",
             "gender": "Male",
             "dob": "1990-01-01",
-            "chronic_conditions": ["Healthy"],
             "allergies": ["Penicillin", "Peanuts"],
             "chronic_diseases": ["Asthma", "Hypertension"],
             "current_medications": [
@@ -331,8 +330,319 @@ def seed_data():
         "updated_at": firestore.SERVER_TIMESTAMP
     })
 
+    # ==================== EXTRA HISTORICAL RECORDS FOR PATIENT 1 (TREND DATA) ====================
+    print("Seeding trend history records for Demo Patient...")
+
+    # Historical CBC — Jan 2026
+    rh1 = db.collection('records').document()
+    rh1.set({
+        "id": rh1.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-01-10T09:00:00Z",
+        "title": "Complete Blood Count (Jan)",
+        "metadata": {
+            "hospital": "City General Lab",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Routine quarterly check."
+        },
+        "ai_analysis": {
+            "summary": "Moderate anemia. WBC and platelets normal.",
+            "extracted_values": [
+                {"parameter": "Hemoglobin", "value": "10.4", "unit": "g/dL", "reference_range": "12.0 - 16.0", "status": "low"},
+                {"parameter": "WBC", "value": "6.9", "unit": "x10^9/L", "reference_range": "4.0 - 11.0", "status": "normal"},
+                {"parameter": "Platelets", "value": "230", "unit": "x10^9/L", "reference_range": "150 - 450", "status": "normal"}
+            ],
+            "suggested_actions": ["Iron supplementation advised"],
+            "processed_at": "2026-01-10T10:00:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Historical CBC — March 2026
+    rh2 = db.collection('records').document()
+    rh2.set({
+        "id": rh2.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-03-05T09:00:00Z",
+        "title": "Complete Blood Count (Mar)",
+        "metadata": {
+            "hospital": "City General Lab",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Follow-up after iron supplementation."
+        },
+        "ai_analysis": {
+            "summary": "Mild improvement in hemoglobin. Still below optimal.",
+            "extracted_values": [
+                {"parameter": "Hemoglobin", "value": "10.9", "unit": "g/dL", "reference_range": "12.0 - 16.0", "status": "low"},
+                {"parameter": "WBC", "value": "7.2", "unit": "x10^9/L", "reference_range": "4.0 - 11.0", "status": "normal"},
+                {"parameter": "Platelets", "value": "242", "unit": "x10^9/L", "reference_range": "150 - 450", "status": "normal"}
+            ],
+            "suggested_actions": ["Continue iron supplementation for 2 more months"],
+            "processed_at": "2026-03-05T10:00:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Historical Lipid Panel — Jan 2026
+    rh3 = db.collection('records').document()
+    rh3.set({
+        "id": rh3.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": patient_uid,
+        "type": "report",
+        "date": "2026-01-20T08:00:00Z",
+        "title": "Lipid Panel (Jan)",
+        "metadata": {
+            "hospital": "Metro Diagnostics",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Baseline lipid profile."
+        },
+        "ai_analysis": {
+            "summary": "Very high cholesterol and LDL at baseline.",
+            "extracted_values": [
+                {"parameter": "Total Cholesterol", "value": "268", "unit": "mg/dL", "reference_range": "100 - 200", "status": "high"},
+                {"parameter": "LDL Cholesterol", "value": "185", "unit": "mg/dL", "reference_range": "0 - 100", "status": "high"},
+                {"parameter": "HDL Cholesterol", "value": "38", "unit": "mg/dL", "reference_range": "40 - 60", "status": "low"},
+                {"parameter": "Triglycerides", "value": "210", "unit": "mg/dL", "reference_range": "30 - 150", "status": "high"}
+            ],
+            "suggested_actions": ["Dietary changes, increase exercise"],
+            "processed_at": "2026-01-20T09:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Historical Lipid Panel — Mar 2026
+    rh4 = db.collection('records').document()
+    rh4.set({
+        "id": rh4.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": patient_uid,
+        "type": "report",
+        "date": "2026-03-20T08:30:00Z",
+        "title": "Lipid Panel (Mar)",
+        "metadata": {
+            "hospital": "Metro Diagnostics",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Follow-up after diet changes."
+        },
+        "ai_analysis": {
+            "summary": "Moderate improvement in LDL and Triglycerides. Still above target.",
+            "extracted_values": [
+                {"parameter": "Total Cholesterol", "value": "255", "unit": "mg/dL", "reference_range": "100 - 200", "status": "high"},
+                {"parameter": "LDL Cholesterol", "value": "172", "unit": "mg/dL", "reference_range": "0 - 100", "status": "high"},
+                {"parameter": "HDL Cholesterol", "value": "42", "unit": "mg/dL", "reference_range": "40 - 60", "status": "normal"},
+                {"parameter": "Triglycerides", "value": "195", "unit": "mg/dL", "reference_range": "30 - 150", "status": "high"}
+            ],
+            "suggested_actions": ["Continue dietary modifications, consider statin therapy"],
+            "processed_at": "2026-03-20T10:00:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Historical Blood Glucose — Jan 2026
+    rh5 = db.collection('records').document()
+    rh5.set({
+        "id": rh5.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": patient_uid,
+        "type": "report",
+        "date": "2026-01-15T07:30:00Z",
+        "title": "Glucose & HbA1c (Jan)",
+        "metadata": {
+            "hospital": "Metro Diagnostics",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Diabetic risk screening baseline."
+        },
+        "ai_analysis": {
+            "summary": "Prediabetic range. HbA1c and glucose elevated.",
+            "extracted_values": [
+                {"parameter": "HbA1c", "value": "6.1", "unit": "%", "reference_range": "4.0 - 5.6", "status": "high"},
+                {"parameter": "Fasting Glucose", "value": "112", "unit": "mg/dL", "reference_range": "70 - 99", "status": "high"}
+            ],
+            "suggested_actions": ["Reduce sugar intake, increase physical activity"],
+            "processed_at": "2026-01-15T08:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Historical Thyroid — Jan 2026
+    rh6 = db.collection('records').document()
+    rh6.set({
+        "id": rh6.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-01-25T08:00:00Z",
+        "title": "Thyroid Function (Jan)",
+        "metadata": {
+            "hospital": "City General Lab",
+            "doctor_name": "Dr. Emily Chen",
+            "notes": "Baseline thyroid panel."
+        },
+        "ai_analysis": {
+            "summary": "TSH significantly elevated. Possible hypothyroidism.",
+            "extracted_values": [
+                {"parameter": "TSH", "value": "5.9", "unit": "mIU/L", "reference_range": "0.4 - 4.0", "status": "high"},
+                {"parameter": "Free T4", "value": "0.9", "unit": "ng/dL", "reference_range": "0.8 - 1.8", "status": "normal"}
+            ],
+            "suggested_actions": ["Repeat in 3 months, monitor symptoms"],
+            "processed_at": "2026-01-25T09:00:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Thyroid — Feb 2026
+    rh7 = db.collection('records').document()
+    rh7.set({
+        "id": rh7.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-02-28T08:00:00Z",
+        "title": "Thyroid Function (Feb)",
+        "metadata": {
+            "hospital": "City General Lab",
+            "doctor_name": "Dr. Emily Chen",
+            "notes": "Monitoring thyroid function."
+        },
+        "ai_analysis": {
+            "summary": "TSH improved slightly but still above normal.",
+            "extracted_values": [
+                {"parameter": "TSH", "value": "5.3", "unit": "mIU/L", "reference_range": "0.4 - 4.0", "status": "high"},
+                {"parameter": "Free T4", "value": "1.0", "unit": "ng/dL", "reference_range": "0.8 - 1.8", "status": "normal"}
+            ],
+            "suggested_actions": ["Continue monitoring"],
+            "processed_at": "2026-02-28T09:00:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Blood Pressure Report — Jan 2026
+    rh8 = db.collection('records').document()
+    rh8.set({
+        "id": rh8.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-01-05T10:00:00Z",
+        "title": "Blood Pressure Monitor (Jan)",
+        "metadata": {
+            "hospital": "City General Hospital",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Home BP monitoring log review."
+        },
+        "ai_analysis": {
+            "summary": "Stage 1 hypertension. Systolic consistently elevated.",
+            "extracted_values": [
+                {"parameter": "Systolic BP", "value": "148", "unit": "mmHg", "reference_range": "90 - 120", "status": "high"},
+                {"parameter": "Diastolic BP", "value": "95", "unit": "mmHg", "reference_range": "60 - 80", "status": "high"},
+                {"parameter": "Heart Rate", "value": "82", "unit": "bpm", "reference_range": "60 - 100", "status": "normal"}
+            ],
+            "suggested_actions": ["Start antihypertensive medication"],
+            "processed_at": "2026-01-05T10:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Blood Pressure — Feb 2026
+    rh9 = db.collection('records').document()
+    rh9.set({
+        "id": rh9.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-02-10T10:00:00Z",
+        "title": "Blood Pressure Monitor (Feb)",
+        "metadata": {
+            "hospital": "City General Hospital",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "1-month follow-up on Amlodipine."
+        },
+        "ai_analysis": {
+            "summary": "Improving response to medication. Systolic trending down.",
+            "extracted_values": [
+                {"parameter": "Systolic BP", "value": "138", "unit": "mmHg", "reference_range": "90 - 120", "status": "high"},
+                {"parameter": "Diastolic BP", "value": "88", "unit": "mmHg", "reference_range": "60 - 80", "status": "high"},
+                {"parameter": "Heart Rate", "value": "78", "unit": "bpm", "reference_range": "60 - 100", "status": "normal"}
+            ],
+            "suggested_actions": ["Continue Amlodipine, recheck in 4 weeks"],
+            "processed_at": "2026-02-10T10:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Blood Pressure — Apr 2026
+    rh10 = db.collection('records').document()
+    rh10.set({
+        "id": rh10.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-04-15T10:00:00Z",
+        "title": "Blood Pressure Monitor (Apr)",
+        "metadata": {
+            "hospital": "City General Hospital",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "3-month Amlodipine review."
+        },
+        "ai_analysis": {
+            "summary": "Good BP control achieved. Approaching target range.",
+            "extracted_values": [
+                {"parameter": "Systolic BP", "value": "128", "unit": "mmHg", "reference_range": "90 - 120", "status": "high"},
+                {"parameter": "Diastolic BP", "value": "82", "unit": "mmHg", "reference_range": "60 - 80", "status": "high"},
+                {"parameter": "Heart Rate", "value": "74", "unit": "bpm", "reference_range": "60 - 100", "status": "normal"}
+            ],
+            "suggested_actions": ["Maintain current dose, lifestyle adherence"],
+            "processed_at": "2026-04-15T10:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    # Blood Pressure — latest May 2026
+    rh11 = db.collection('records').document()
+    rh11.set({
+        "id": rh11.id,
+        "patient_uid": patient_uid,
+        "uploaded_by": doctor_uid,
+        "type": "report",
+        "date": "2026-05-20T10:00:00Z",
+        "title": "Blood Pressure Monitor (May)",
+        "metadata": {
+            "hospital": "City General Hospital",
+            "doctor_name": "Dr. Sarah Smith",
+            "notes": "Ongoing BP monitoring."
+        },
+        "ai_analysis": {
+            "summary": "BP near normal. Good medication adherence.",
+            "extracted_values": [
+                {"parameter": "Systolic BP", "value": "122", "unit": "mmHg", "reference_range": "90 - 120", "status": "high"},
+                {"parameter": "Diastolic BP", "value": "80", "unit": "mmHg", "reference_range": "60 - 80", "status": "normal"},
+                {"parameter": "Heart Rate", "value": "72", "unit": "bpm", "reference_range": "60 - 100", "status": "normal"}
+            ],
+            "suggested_actions": ["Excellent progress, continue current management"],
+            "processed_at": "2026-05-20T10:30:00Z"
+        },
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
     # ==================== SEED DATA FOR PATIENT 2: JOHN DOE ====================
     print("Seeding records for John Doe...")
+
     r2_1 = db.collection('records').document()
     r2_1.set({
         "id": r2_1.id,

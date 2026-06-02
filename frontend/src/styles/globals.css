@@ -157,17 +157,17 @@
 [data-theme="dark"] {
   --color-background: #0b1120;
   --color-surface: #111827;
-  --color-surface-2: #1a2236;
-  --color-border: #1e293b;
-  --color-border-strong: #334155;
+  --color-surface-2: #182030;
+  --color-border: #243044;
+  --color-border-strong: #374f6b;
   --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #475569;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #7c90a8;
   --color-light: #0b1120;
   --color-dark: #f1f5f9;
-  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
 }
 
 /* ============================================================
@@ -329,14 +329,15 @@
   .ring-health-bad  { stroke: var(--color-danger); }
 
   /* Status badges */
-  .status-normal { background: #d1fae5; color: #065f46; }
-  .status-high   { background: #fee2e2; color: #991b1b; }
-  .status-low    { background: #dbeafe; color: #1e3a8a; }
-  .status-critical { background: #7f1d1d; color: #fef2f2; }
+  .status-normal   { background: #d1fae5; color: #065f46; }
+  .status-high     { background: #fee2e2; color: #991b1b; }
+  .status-low      { background: #dbeafe; color: #1e3a8a; }
+  .status-critical { background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; }
 
-  [data-theme="dark"] .status-normal { background: rgba(6, 95, 70, 0.3); color: #6ee7b7; }
-  [data-theme="dark"] .status-high   { background: rgba(153, 27, 27, 0.3); color: #fca5a5; }
-  [data-theme="dark"] .status-low    { background: rgba(30, 58, 138, 0.3); color: #93c5fd; }
+  [data-theme="dark"] .status-normal   { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
+  [data-theme="dark"] .status-high     { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+  [data-theme="dark"] .status-low      { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+  [data-theme="dark"] .status-critical { background: rgba(239, 68, 68, 0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
 
   /* Page transition container */
   .page-container {

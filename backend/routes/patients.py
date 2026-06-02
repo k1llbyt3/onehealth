@@ -192,6 +192,90 @@ def export_report():
         mimetype="application/pdf"
     )
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Health Score Engine
+# Derived from the LATEST lab result per parameter — never hardcoded.
+#
+# Scoring per status:
+#   normal   → 100   (within reference range)
+#   low      → 68    (below range — suboptimal)
+#   high     → 58    (above range — needs attention)
+#   critical → 22    (severely out of range)
+# ─────────────────────────────────────────────────────────────────────────────
+STATUS_SCORE = {
+    'normal':   100,
+    'low':       68,
+    'high':      58,
+    'critical':  22,
+}
+
+# Params that are dosages / non-physiological — exclude from score
+SCORE_EXCLUDED = {
+    'Amlodipine Dosage', 'Lisinopril', 'Albuterol Inhaler',
+    'Dose Number', 'Weight', 'BMI', 'Height', 'Body Weight',
+}
+
+def compute_health_score(records):
+    """
+    Compute patient health score (0-100) dynamically from lab records.
+    Only the LATEST reading per unique parameter is used.
+    Returns None if no valid lab data is available.
+    """
+    # latest status per parameter (newer records overwrite older)
+    param_status = {}
+
+    sorted_recs = sorted(
+        (r for r in records if r.get('type') == 'report'),
+        key=lambda r: r.get('date', '')
+    )
+
+    for rec in sorted_recs:
+        extracted = rec.get('ai_analysis', {}).get('extracted_values', [])
+        for ev in extracted:
+            param = ev.get('parameter', '').strip()
+            status = ev.get('status', 'normal').lower()
+            if param and param not in SCORE_EXCLUDED:
+                param_status[param] = status
+
+    if not param_status:
+        return None
+
+    total = sum(STATUS_SCORE.get(s, 58) for s in param_status.values())
+    raw = round(total / len(param_status))
+    return max(0, min(100, raw))
+
+
+@patients_bp.route('/health-score', methods=['GET'])
+@require_auth(roles=['patient', 'doctor', 'admin'])
+@rate_limit(limit=60, window=60)
+def get_health_score():
+    """On-demand health score recalculation for the authenticated patient."""
+    role = g.user.get('role')
+    if role == 'doctor':
+        uid = request.args.get('patient_uid')
+        if not uid:
+            raise ValidationError({"reason": "patient_uid is required for doctors"})
+    else:
+        uid = g.user.get('uid')
+
+    records = FirebaseService.query_documents("records", "patient_uid", "==", uid)
+    score = compute_health_score(records)
+
+    if score is not None:
+        # Persist back so patient-list views stay in sync
+        try:
+            user_data = FirebaseService.get_document("users", uid)
+            profile = user_data.get("profile", {})
+            profile["health_score"] = score
+            user_data["profile"] = profile
+            FirebaseService.create_document("users", user_data, doc_id=uid)
+        except Exception:
+            pass  # non-fatal
+
+    return jsonify({"health_score": score, "source": "computed"}), 200
+
+
 @patients_bp.route('/passport/<passport_id>', methods=['GET'])
 @require_auth(roles=['patient', 'doctor', 'admin'])
 @rate_limit(limit=100, window=60)
@@ -199,42 +283,57 @@ def get_passport_data(passport_id):
     users = FirebaseService.query_documents("users", "passport_id", "==", passport_id)
     if not users:
         raise ResourceNotFoundError({"reason": f"Patient with passport ID {passport_id} not found"})
-    
+
     patient = users[0]
     patient_uid = patient.get("uid")
-    
+
     if g.user.get('role') == 'patient' and g.user.get('uid') != patient_uid:
         raise ResourceNotFoundError({"reason": "Unauthorized to view this passport ID"})
-        
+
     records = FirebaseService.query_documents("records", "patient_uid", "==", patient_uid)
     medications = FirebaseService.query_documents("medications", "patient_uid", "==", patient_uid)
-    
+
+    # ── Compute health score from real data ──────────────────────────────────
+    computed_score = compute_health_score(records)
+
+    profile = patient.get("profile", {})
+    if computed_score is not None:
+        profile["health_score"] = computed_score
+        # Write computed score back so patient-list views stay current
+        try:
+            patient["profile"] = profile
+            FirebaseService.create_document("users", patient, doc_id=patient_uid)
+        except Exception:
+            pass  # non-fatal; best-effort persistence
+    # ─────────────────────────────────────────────────────────────────────────
+
     timeline = []
     for r in records:
         timeline.append({"type": "record", "date": r.get("date"), "data": r})
     for m in medications:
         timeline.append({"type": "medication", "date": m.get("start_date"), "data": m})
-        
+
     timeline.sort(key=lambda x: x["date"], reverse=True)
-    
+
     active_meds = [m for m in medications if m.get("status") == "active"]
-    
+
     emergency_card = {
         "name": patient.get("name"),
-        "blood_group": patient.get("profile", {}).get("blood_group"),
-        "allergies": patient.get("profile", {}).get("allergies", []),
-        "chronic_diseases": patient.get("profile", {}).get("chronic_diseases", []),
-        "emergency_contacts": patient.get("profile", {}).get("emergency_contacts", []),
+        "blood_group": profile.get("blood_group"),
+        "allergies": profile.get("allergies", []),
+        "chronic_diseases": profile.get("chronic_diseases", []),
+        "emergency_contacts": profile.get("emergency_contacts", []),
         "active_medications": active_meds
     }
-    
+
     return jsonify({
-        "profile": patient.get("profile", {}),
+        "profile": profile,          # includes computed health_score
         "name": patient.get("name"),
         "email": patient.get("email"),
         "phone": patient.get("phone"),
         "passport_id": passport_id,
+        "health_score": computed_score,  # also top-level for easy access
+        "score_source": "computed" if computed_score is not None else "stored",
         "timeline": timeline,
         "emergency_card": emergency_card
     }), 200
-
