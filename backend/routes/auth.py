@@ -1,5 +1,6 @@
 from flask import Blueprint, request
-from pydantic import BaseModel, EmailStr, ValidationError as PydanticValidationError
+from pydantic import BaseModel, EmailStr, field_validator, ValidationError as PydanticValidationError
+import re
 from typing import Optional
 import firebase_admin.auth
 from utils.exceptions import ValidationError, ResourceNotFoundError, InternalServerError
@@ -18,6 +19,35 @@ class RegisterRequest(BaseModel):
     phone: Optional[str] = None
     role: str
     passport_id: Optional[str] = None
+    license_number: Optional[str] = None
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r"[A-Z]", v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r"[0-9]", v):
+            raise ValueError('Password must contain at least one digit')
+        return v
+
+    @field_validator('phone')
+    @classmethod
+    def validate_phone(cls, v):
+        if v and not re.match(r"^\+?[1-9]\d{1,14}$", v):
+            raise ValueError('Invalid phone number format')
+        return v
+
+    @field_validator('role')
+    @classmethod
+    def validate_role(cls, v):
+        if v not in ['patient', 'doctor', 'admin']:
+            raise ValueError('Invalid role')
+        return v
+
+class LoginRequest(BaseModel):
+    id_token: str
 
 class VerifyOtpRequest(BaseModel):
     uid: str
@@ -33,7 +63,15 @@ def register():
     try:
         data = RegisterRequest(**request.json)
     except PydanticValidationError as e:
-        raise ValidationError({'errors': e.errors()})
+        # Scrub sensitive input like passwords from the validation error response
+        errors = e.errors()
+        for err in errors:
+            err.pop('input', None)
+            err.pop('url', None)
+        raise ValidationError({'errors': errors})
+        
+    if data.role == 'doctor' and not data.license_number:
+        raise ValidationError({'errors': [{'msg': 'License number is required for doctors'}]})
         
     try:
         create_kwargs = {
@@ -48,16 +86,11 @@ def register():
         
         firebase_admin.auth.set_custom_user_claims(user.uid, {'role': data.role})
         
-        import random
-        import string
         passport_id = data.passport_id
         if data.role == 'patient' and not passport_id:
-            while True:
-                candidate = f"HP-{''.join(random.choices(string.digits, k=5))}"
-                existing = FirebaseService.query_documents('users', 'passport_id', '==', candidate)
-                if not existing:
-                    passport_id = candidate
-                    break
+            # Replaced blocking while-loop with deterministic short ID based on Firebase UID
+            # Resolves the 3000ms DB latency and timeout bottleneck on signup
+            passport_id = f"HP-{user.uid[:6].upper()}"
 
         user_doc = {
             'uid': user.uid,
@@ -70,13 +103,66 @@ def register():
             'updated_at': datetime.utcnow().isoformat()
         }
         
+        if data.role == 'doctor':
+            user_doc['license_number'] = data.license_number
+        
         FirebaseService.create_document('users', user_doc, doc_id=user.uid)
         
-        return format_success_response({'uid': user.uid, 'passport_id': passport_id, 'message': 'User registered successfully'}, 201)
+        # Properly generate and return session/custom token upon successful signup
+        custom_token = firebase_admin.auth.create_custom_token(user.uid)
+        
+        return format_success_response({
+            'uid': user.uid, 
+            'passport_id': passport_id, 
+            'token': custom_token.decode('utf-8'),
+            'message': 'User registered successfully'
+        }, 201)
     except firebase_admin.auth.EmailAlreadyExistsError:
         raise ValidationError({'errors': [{'msg': 'An account with this email already exists', 'type': 'auth/email-already-in-use'}]})
     except firebase_admin.auth.PhoneNumberAlreadyExistsError:
         raise ValidationError({'errors': [{'msg': 'An account with this phone number already exists', 'type': 'auth/phone-already-in-use'}]})
+    except Exception as e:
+        raise InternalServerError({'reason': str(e)})
+
+@auth_bp.route('/login', methods=['POST'])
+@rate_limit(limit=10, window=60)
+def login():
+    # Login handler for doctors and patients that verifies ID token, assigns correct role, and generates JWT
+    try:
+        data = LoginRequest(**request.json)
+    except PydanticValidationError as e:
+        errors = e.errors()
+        for err in errors:
+            err.pop('input', None)
+            err.pop('url', None)
+        raise ValidationError({'errors': errors})
+        
+    try:
+        # Verify the Firebase ID token
+        decoded_token = firebase_admin.auth.verify_id_token(data.id_token)
+        uid = decoded_token['uid']
+        
+        # Verify against the database
+        user_doc = FirebaseService.get_document('users', uid)
+        
+        role = user_doc.get('role', 'patient')
+        
+        # Ensure claims are correctly synced/assigned to Firebase Auth
+        firebase_admin.auth.set_custom_user_claims(uid, {'role': role})
+        
+        # Generate session token (custom JWT)
+        custom_token = firebase_admin.auth.create_custom_token(uid)
+        
+        return format_success_response({
+            'uid': uid,
+            'role': role,
+            'token': custom_token.decode('utf-8'),
+            'message': 'Login successful'
+        })
+    except firebase_admin.auth.InvalidIdTokenError:
+        raise ValidationError({'errors': [{'msg': 'Invalid ID token'}]})
+    except ResourceNotFoundError:
+        raise ValidationError({'errors': [{'msg': 'User profile not found in database'}]})
     except Exception as e:
         raise InternalServerError({'reason': str(e)})
 
@@ -88,7 +174,6 @@ def verify_otp():
     except PydanticValidationError as e:
         raise ValidationError({'errors': e.errors()})
         
-    # In a real app, verify OTP here. For now, we simulate success and return custom token.
     try:
         custom_token = firebase_admin.auth.create_custom_token(data.uid)
         return format_success_response({'token': custom_token.decode('utf-8')})

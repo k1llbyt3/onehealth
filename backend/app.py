@@ -57,12 +57,13 @@ def create_app(config_class=AppConfig):
 
     @app.errorhandler(Exception)
     def handle_unexpected_error(error):
+        app.logger.error(f"Unhandled exception: {str(error)}")
         internal_error = InternalServerError()
         return format_error_response(
             internal_error.code,
             internal_error.message,
             internal_error.status,
-            {"exception": str(error)}
+            {} # Removed str(error) to prevent leaking sensitive data or passwords to the client
         )
 
     # Initialize Background Scheduler

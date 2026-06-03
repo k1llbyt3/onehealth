@@ -75,10 +75,10 @@ function HealthScoreRing({ score }) {
 /* ─── Quick Action Card ─── */
 function QuickAction({ icon: Icon, label, desc, to, color = 'primary' }) {
   const colorMap = {
-    primary: { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600', hover: 'group-hover:bg-blue-600 group-hover:text-white' },
-    success: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-600', hover: 'group-hover:bg-emerald-600 group-hover:text-white' },
-    warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600', hover: 'group-hover:bg-amber-600 group-hover:text-white' },
-    danger:  { bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-600', hover: 'group-hover:bg-red-600 group-hover:text-white' },
+    primary: { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400', hover: 'group-hover:bg-blue-600 group-hover:text-white' },
+    success: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-600 dark:text-emerald-400', hover: 'group-hover:bg-emerald-600 group-hover:text-white' },
+    warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', hover: 'group-hover:bg-amber-600 group-hover:text-white' },
+    danger:  { bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-600 dark:text-red-400', hover: 'group-hover:bg-red-600 group-hover:text-white' },
   }
   const c = colorMap[color]
   return (
@@ -92,7 +92,7 @@ function QuickAction({ icon: Icon, label, desc, to, color = 'primary' }) {
         <div className={`w-10 h-10 rounded-xl mb-3 flex items-center justify-center transition-all duration-200 shadow-sm ${c.bg} ${c.text} ${c.hover}`}>
           <Icon size={20} />
         </div>
-        <h3 className="font-semibold text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] transition-colors">{label}</h3>
+        <h3 className="font-semibold text-sm text-[var(--color-text-primary)] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{label}</h3>
         <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{desc}</p>
       </motion.div>
     </Link>
@@ -113,7 +113,7 @@ function ActivityItem({ record, index }) {
         <FileText size={14} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[var(--color-text-primary)] truncate group-hover:text-[var(--color-primary)] transition-colors">{record.title}</p>
+        <p className="text-sm font-medium text-[var(--color-text-primary)] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{record.title}</p>
         <p className="text-xs text-[var(--color-text-muted)]">
           {record.metadata?.doctor_name && `${record.metadata.doctor_name} · `}
           {formatDate(record.date)}
@@ -440,7 +440,7 @@ export default function Dashboard() {
                       onClick={() => setTrendType(t)}
                       className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all cursor-pointer ${
                         trendType === t
-                          ? 'bg-[var(--color-surface)] text-[var(--color-primary)] shadow-sm'
+                          ? 'bg-[var(--color-surface)] text-blue-600 dark:text-blue-400 shadow-sm'
                           : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                       }`}
                     >
@@ -477,7 +477,7 @@ export default function Dashboard() {
                   <p className="text-xs text-[var(--color-text-muted)]">Upload lab reports to see your trends</p>
                   <button
                     onClick={() => navigate('/passport')}
-                    className="mt-3 text-xs text-[var(--color-primary)] font-medium hover:underline cursor-pointer"
+                    className="mt-3 text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
                   >
                     Upload your first report →
                   </button>
@@ -522,10 +522,10 @@ export default function Dashboard() {
             <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-[var(--color-primary)]" />
+                  <Clock size={14} className="text-blue-600 dark:text-blue-400" />
                   <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Today's Medications</h3>
                 </div>
-                <Link to="/medications" className="text-xs text-[var(--color-primary)] hover:underline cursor-pointer">
+                <Link to="/medications" className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
                   View all
                 </Link>
               </div>
@@ -542,7 +542,7 @@ export default function Dashboard() {
                         <p className="text-xs font-semibold text-[var(--color-text-primary)]">{med.name} {med.dosage}</p>
                         <p className="text-[10px] text-[var(--color-text-muted)]">{med.frequency || 'As prescribed'}</p>
                       </div>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-xl bg-[var(--color-primary)]/10 text-blue-600 dark:text-blue-400">
                         Active
                       </span>
                     </div>
@@ -552,7 +552,7 @@ export default function Dashboard() {
                 <div className="py-4 text-center">
                   <Pill size={24} className="text-[var(--color-text-muted)] mx-auto mb-2" />
                   <p className="text-xs text-[var(--color-text-muted)]">No medications tracked yet</p>
-                  <Link to="/medications" className="text-xs text-[var(--color-primary)] font-medium hover:underline mt-1 block cursor-pointer">
+                  <Link to="/medications" className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline mt-1 block cursor-pointer">
                     Add medications →
                   </Link>
                 </div>
@@ -585,7 +585,7 @@ export default function Dashboard() {
               ) : (
                 <div className="py-3 text-center">
                   <p className="text-xs text-[var(--color-text-muted)]">Complete your health profile</p>
-                  <Link to="/onboarding" className="text-xs text-[var(--color-primary)] font-medium hover:underline mt-1 block cursor-pointer">
+                  <Link to="/onboarding" className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline mt-1 block cursor-pointer">
                     Update profile →
                   </Link>
                 </div>
@@ -605,7 +605,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Recent Activity</h2>
-            <Link to="/passport" className="flex items-center gap-1 text-sm text-[var(--color-primary)] font-medium hover:underline cursor-pointer">
+            <Link to="/passport" className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer">
               View all <ChevronRight size={14} />
             </Link>
           </div>
