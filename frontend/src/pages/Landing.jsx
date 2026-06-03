@@ -81,7 +81,7 @@ function BentoCard({ feature, index }) {
         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
           {feature.title}
         </h3>
-        <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">
+        <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm">
           {feature.desc}
         </p>
 
@@ -137,7 +137,7 @@ export default function Landing() {
                 <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">
                   {authIntent === 'login' ? 'Welcome Back' : 'Get Started'}
                 </h2>
-                <p className="text-slate-500 dark:text-slate-400">Choose your account type to continue.</p>
+                <p className="text-slate-700 dark:text-slate-300">Choose your account type to continue.</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -155,7 +155,7 @@ export default function Landing() {
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-900 dark:text-white">{opt.label}</h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{opt.desc}</p>
+                      <p className="text-xs text-slate-700 dark:text-slate-300">{opt.desc}</p>
                     </div>
                     <ChevronRight size={18} className="ml-auto text-slate-300" />
                   </button>
@@ -163,7 +163,7 @@ export default function Landing() {
               </div>
 
               <div className="mt-8 text-center">
-                <button onClick={() => setAuthIntent(null)} className="text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition-colors">
+                <button onClick={() => setAuthIntent(null)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition-colors">
                   Go back
                 </button>
               </div>
@@ -187,7 +187,7 @@ export default function Landing() {
             <span className="font-black text-xl text-slate-900 dark:text-white tracking-tighter">oneHealth</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-300">
             <a href="#features" className="hover:text-primary transition-colors">Features</a>
             <a href="#about" className="hover:text-primary transition-colors">About</a>
             <Link to="/register" className="hover:text-primary transition-colors">Doctors</Link>
@@ -271,7 +271,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-lg md:text-xl text-slate-700 dark:text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed"
           >
             A unified, AI-powered health repository that ensures your critical medical information is available to first responders and doctors in real-time.
           </motion.p>
@@ -300,7 +300,7 @@ export default function Landing() {
       {/* Trust Section (Infinite Marquee) */}
       <section className="py-20 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-6 overflow-hidden">
-          <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-12">Trusted by Clinical Ecosystems</p>
+          <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 dark:text-slate-400 mb-12">Trusted by Clinical Ecosystems</p>
           <div className="flex flex-wrap justify-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
             {['HIPAA', 'ISO 27001', 'AES-256', 'SOC2'].map(trust => (
               <div key={trust} className="flex items-center gap-2">
@@ -322,7 +322,7 @@ export default function Landing() {
                 Intelligence built for <span className="text-primary">critical moments.</span>
               </motion.h2>
             </div>
-            <motion.p {...fadeUp(0.2)} className="text-lg text-slate-500 dark:text-slate-400 max-w-xs leading-relaxed">
+            <motion.p {...fadeUp(0.2)} className="text-lg text-slate-700 dark:text-slate-300 max-w-xs leading-relaxed">
               We've engineered every feature to respond when time is the most precious resource.
             </motion.p>
           </div>
@@ -351,7 +351,7 @@ export default function Landing() {
                 <p className="text-sm font-medium italic text-slate-700 dark:text-slate-300">
                   "OneHealth unified 15 years of my history in 10 minutes. It's medical freedom."
                 </p>
-                <p className="mt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Arjun Nair · Patient</p>
+                <p className="mt-4 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">Arjun Nair · Patient</p>
               </div>
             </motion.div>
 
@@ -360,7 +360,7 @@ export default function Landing() {
                 <motion.h2 {...fadeUp()} className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
                   Ownership is the <span className="text-primary">cure.</span>
                 </motion.h2>
-                <motion.p {...fadeUp(0.1)} className="text-xl text-slate-500 dark:text-slate-400 leading-relaxed">
+                <motion.p {...fadeUp(0.1)} className="text-xl text-slate-700 dark:text-slate-300 leading-relaxed">
                   For too long, medical records have been siloed in hospital databases. oneHealth returns the keys to the patient, ensuring your history travels with you, wherever you go.
                 </motion.p>
               </div>
@@ -377,7 +377,7 @@ export default function Landing() {
                       <item.icon size={20} />
                     </div>
                     <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">{item.title}</h4>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-snug">{item.desc}</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-snug">{item.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -405,7 +405,7 @@ export default function Landing() {
           <motion.h2 {...fadeUp(0.1)} className="text-5xl md:text-7xl font-black tracking-tight mb-8">
             Your health deserves a <span className="text-primary italic">permanent</span> home.
           </motion.h2>
-          <motion.p {...fadeUp(0.2)} className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <motion.p {...fadeUp(0.2)} className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
             Join the decentralized health movement. Secure your lifetime passport today — free for patients, forever.
           </motion.p>
           <motion.div {...fadeUp(0.3)}>
@@ -429,19 +429,19 @@ export default function Landing() {
               </div>
               <span className="font-black text-xl text-slate-900 dark:text-white tracking-tighter">oneHealth</span>
             </div>
-            <p className="text-sm text-slate-400 max-w-xs">
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xs">
               Empowering patients with decentralized medical records and AI-driven clinical intelligence.
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <div className="flex flex-wrap justify-center gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">
             <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-primary transition-colors">HIPAA Compliance</a>
             <a href="#" className="hover:text-primary transition-colors">Contact</a>
           </div>
 
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
             © 2026 oneHealth · Built for Hackverse
           </p>
         </div>
